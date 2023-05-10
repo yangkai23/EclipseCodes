@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class PLOS_Segregation {
-	private static final String WORKING_FOLDER = "C:\\cps\\provider_setup\\PLoS\\scraping\\File\\2023-05-08";
+	private static final String WORKING_FOLDER = "C:\\cps\\provider_setup\\PLoS\\scraping\\File\\2023-05-09";
 
 	/*
 	 * Files.move is not equivalent to the mv command. It won't detect that the
