@@ -20,6 +20,7 @@ public class OccurenceArrEle {
 		for (int i = 0; i < nums.length; i++) {
 			occurences[nums[i]]++;
 		}
+		System.out.println(Arrays.toString(occurences));
 		for (int i = 0; i < occurences.length; i++) {
 			if (occurences[i] == 0)
 				continue;

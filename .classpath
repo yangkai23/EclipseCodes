@@ -7,5 +7,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="C:/cps/other projects/jars/zip4j-2.11.5.jar"/>
+	<classpathentry kind="lib" path="lib/ojdbc8-21.9.0.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
