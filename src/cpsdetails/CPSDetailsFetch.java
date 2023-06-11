@@ -19,6 +19,7 @@ public class CPSDetailsFetch {
 	private static final String uatUrl = "jdbc:oracle:thin:@//cps-amp-stable.czazctzymxax.us-west-2.rds.amazonaws.com:1521/CPSAMP";
 	private static final String userName = "cps_user";
 	private static final String password = "cps_user";
+	private static boolean likeFlag = false;
 
 	static {
 		try {
@@ -43,18 +44,20 @@ public class CPSDetailsFetch {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return null;
+		return Optional.empty();
 	}
 
 	public static Optional<PreparedStatement> getPreparedStatement(Optional<Connection> connection, String sql) {
 		if (connection.isPresent()) {
 			try {
+				if (sql.contains("Like"))
+					likeFlag = true;
 				return Optional.ofNullable(connection.get().prepareStatement(sql));
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
-		return null;
+		return Optional.empty();
 	}
 
 	public static void getDetailsUsingID(Optional<PreparedStatement> statement) {
@@ -72,15 +75,20 @@ public class CPSDetailsFetch {
 		if (statement.isPresent()) {
 			preparedStatement = statement.get();
 			fileRead: while (field != null) {
+				System.out.println(field);
 				ResultSet resultSet = null;
 				try {
+					if (likeFlag)
+						field = "%" + field.concat("%");
 					preparedStatement.setString(1, field);
 					resultSet = preparedStatement.executeQuery();
 					if (!resultSet.next()) {
 						writer.write("No details found");
+						field = reader.readLine();
 						continue fileRead;
 					}
 					while (resultSet.next()) {
+						System.out.println("Inside ");
 						StringBuilder builder = new StringBuilder();
 						for (int i = 1; i <= 13; i++) {
 							builder.append(resultSet.getString(i));
@@ -89,9 +97,9 @@ public class CPSDetailsFetch {
 						}
 						writer.write(builder.toString());
 						writer.newLine();
+						writer.flush();
 					}
 					field = reader.readLine();
-					writer.flush();
 				}
 
 				catch (SQLException | IOException e) {

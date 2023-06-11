@@ -15,6 +15,9 @@ public final class CpsQueries {
 	public static final String prepIdQuery = templateQuery + "\n WHERE pci.id IN (?)";
 	public static final String receiptIdQuery = templateQuery + "\n WHERE ACQUISITION.ACQ_RECEIPT_ID in (?)";
 	public static final String inputFileNameQuery = templateQuery
-			+ "\n WHERE SUBSTR(PCI.CONTENT_INFO,INSTR(PCI.CONTENT_INFO,'/',-1,1)+1) like (?)";
-	public static final String DeliveryFileQuery = templateQuery + "\n WHERE DELIVERY_FILE_NAME in (?)";
+			+ "\n WHERE SUBSTR(PCI.CONTENT_INFO,INSTR(PCI.CONTENT_INFO,'/',-1,1)+1) in (?)";
+	public static final String inputFileNameQueryUsingLike = templateQuery
+			+ "\n WHERE SUBSTR(PCI.CONTENT_INFO,INSTR(PCI.CONTENT_INFO,'/',-1,1)+1) like ?";
+	public static final String deliveryFileQuery = templateQuery + "\n WHERE DELIVERY_FILE_NAME in (?)";
+	public static final String workflowIdQuery = templateQuery + "\n WHERE pci.last_orchestration_id IN  (?)";
 }
