@@ -54,8 +54,9 @@ public class CPSDetailsFetch {
 				if (sql.contains("like")) {
 					CPSDetailsFetch.likeFlag = true;
 				}
-					
-				return Optional.ofNullable(connection.get().prepareStatement(sql ,ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE));
+
+				return Optional.ofNullable(connection.get().prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE,
+						ResultSet.CONCUR_UPDATABLE));
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -80,9 +81,9 @@ public class CPSDetailsFetch {
 			int fieldCount = 0;
 			fileRead: while (field != null) {
 				fieldCount++;
-				System.out.println(fieldCount+".  "+ field);
+				System.out.println(fieldCount + ".  " + field);
 				ResultSet resultSet = null;
-				
+
 				try {
 					if (likeFlag)
 						field = "%" + field.concat("%");
@@ -99,7 +100,7 @@ public class CPSDetailsFetch {
 						writer.newLine();
 					}
 					if (!resultSet.next()) {
-						writer.write("No details found for "+ field);
+						writer.write("No details found for " + field);
 						field = reader.readLine();
 						writer.newLine();
 						continue fileRead;
@@ -118,15 +119,21 @@ public class CPSDetailsFetch {
 						}
 					}
 					field = reader.readLine();
-				}
-
-				catch (SQLException | IOException e) {
+				} catch (SQLException | IOException e) {
+					StringBuilder mailSubject = new StringBuilder();
+					mailSubject.append("Exception occured !!!!\n").append(e);
+					MailNotification.sendMail(mailSubject.toString(), "Error while Fetching Details");
 					e.printStackTrace();
 				}
 			}
-
+			StringBuilder mailSubject = new StringBuilder();
+			mailSubject.append("Details Fetching completed .............\n")
+					.append("No . of items searched : " + fieldCount);
+			MailNotification.sendMail(mailSubject.toString(), "Details Fetching Notification");
 		} else {
 			System.out.println("Check the credetials");
+			MailNotification.sendMail("Connection lost Please enable the VPN / bastion connection",
+					"Connection Error Notification");
 		}
 
 	}
