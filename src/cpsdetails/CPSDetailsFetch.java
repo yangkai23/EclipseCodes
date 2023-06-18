@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Optional;
 
@@ -19,7 +20,7 @@ public class CPSDetailsFetch {
 	private static final String uatUrl = "jdbc:oracle:thin:@//cps-amp-stable.czazctzymxax.us-west-2.rds.amazonaws.com:1521/CPSAMP";
 	private static final String userName = "cps_user";
 	private static final String password = "cps_user";
-	private static boolean likeFlag = false;
+	private static boolean likeFlag;
 
 	static {
 		try {
@@ -50,9 +51,11 @@ public class CPSDetailsFetch {
 	public static Optional<PreparedStatement> getPreparedStatement(Optional<Connection> connection, String sql) {
 		if (connection.isPresent()) {
 			try {
-				if (sql.contains("Like"))
-					likeFlag = true;
-				return Optional.ofNullable(connection.get().prepareStatement(sql));
+				if (sql.contains("like")) {
+					CPSDetailsFetch.likeFlag = true;
+				}
+					
+				return Optional.ofNullable(connection.get().prepareStatement(sql ,ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE));
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -74,30 +77,45 @@ public class CPSDetailsFetch {
 		}
 		if (statement.isPresent()) {
 			preparedStatement = statement.get();
+			int fieldCount = 0;
 			fileRead: while (field != null) {
-				System.out.println(field);
+				fieldCount++;
+				System.out.println(fieldCount+".  "+ field);
 				ResultSet resultSet = null;
+				
 				try {
 					if (likeFlag)
 						field = "%" + field.concat("%");
+					System.out.println(field);
 					preparedStatement.setString(1, field);
 					resultSet = preparedStatement.executeQuery();
-					if (!resultSet.next()) {
-						writer.write("No details found");
-						field = reader.readLine();
-						continue fileRead;
-					}
-					while (resultSet.next()) {
-						System.out.println("Inside ");
-						StringBuilder builder = new StringBuilder();
+					ResultSetMetaData metaData = resultSet.getMetaData();
+					if (fieldCount == 1) {
 						for (int i = 1; i <= 13; i++) {
-							builder.append(resultSet.getString(i));
+							writer.write(metaData.getColumnName(i));
 							if (i < 13)
-								builder.append(",");
+								writer.write(",");
 						}
-						writer.write(builder.toString());
 						writer.newLine();
-						writer.flush();
+					}
+					if (!resultSet.next()) {
+						writer.write("No details found for "+ field);
+						field = reader.readLine();
+						writer.newLine();
+						continue fileRead;
+					} else {
+						resultSet.beforeFirst();
+						while (resultSet.next()) {
+							StringBuilder builder = new StringBuilder();
+							for (int i = 1; i <= 13; i++) {
+								builder.append(resultSet.getString(i));
+								if (i < 13)
+									builder.append(",");
+							}
+							writer.write(builder.toString());
+							writer.newLine();
+							writer.flush();
+						}
 					}
 					field = reader.readLine();
 				}
