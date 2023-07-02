@@ -1,7 +1,5 @@
 package cpsdetails;
 
-import java.time.LocalDateTime;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Properties;
 
@@ -15,7 +13,6 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMessage.RecipientType;
 
 public class MailNotification {
-	@SuppressWarnings("deprecation")
 	public static void sendMail(String body, String subject) {
 		Properties properties = new Properties();
 		properties.put("mail.transport.protocol", "smtp");

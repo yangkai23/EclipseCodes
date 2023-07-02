@@ -21,6 +21,7 @@ public class CPSDetailsFetch {
 	private static final String userName = "cps_user";
 	private static final String password = "cps_user";
 	private static boolean likeFlag;
+	private static boolean AMDFlag;
 
 	static {
 		try {
@@ -51,10 +52,10 @@ public class CPSDetailsFetch {
 	public static Optional<PreparedStatement> getPreparedStatement(Optional<Connection> connection, String sql) {
 		if (connection.isPresent()) {
 			try {
-				if (sql.contains("like")) {
+				if (sql.contains("like"))
 					CPSDetailsFetch.likeFlag = true;
-				}
-
+				else if (sql.contains("ARTICLEMETADATA"))
+					AMDFlag = true;
 				return Optional.ofNullable(connection.get().prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE,
 						ResultSet.CONCUR_UPDATABLE));
 			} catch (SQLException e) {
@@ -92,7 +93,13 @@ public class CPSDetailsFetch {
 					resultSet = preparedStatement.executeQuery();
 					ResultSetMetaData metaData = resultSet.getMetaData();
 					if (fieldCount == 1) {
-						for (int i = 1; i <= 13; i++) {
+//						21
+						int iterations;
+						if (AMDFlag)
+							iterations = 21;
+						else
+							iterations = 13;
+						for (int i = 1; i <= iterations; i++) {
 							writer.write(metaData.getColumnName(i));
 							if (i < 13)
 								writer.write(",");

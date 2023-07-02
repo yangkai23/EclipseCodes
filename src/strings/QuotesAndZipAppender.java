@@ -25,7 +25,7 @@ public class QuotesAndZipAppender {
 				isString = false;
 			if (!isString && firstLine.length() != ID_LENGTH)
 				isString = true;
-			if (firstLine.equals("doi"))
+			if (firstLine.equalsIgnoreCase("doi"))
 				isString = false;
 			StringBuilder line = new StringBuilder(firstLine);
 			append(reader, writer, isString, line);

@@ -20,4 +20,5 @@ public final class CpsQueries {
 			+ "\n WHERE SUBSTR(PCI.CONTENT_INFO,INSTR(PCI.CONTENT_INFO,'/',-1,1)+1) like ?";
 	public static final String deliveryFileQuery = templateQuery + "\n WHERE DELIVERY_FILE_NAME in (?)";
 	public static final String workflowIdQuery = templateQuery + "\n WHERE pci.last_orchestration_id IN  (?)";
+	public static final String articleIDQuery = "select * from cps.ARTICLEMETADATA a where a.ARTICLEID in (?)";
 }
