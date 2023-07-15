@@ -17,10 +17,10 @@ public class MoveZeroToLeft {
 		 * else if (lastNonZeroPos != i) { ar[lastNonZeroPos + 1] = ar[i]; ar[i] = 0;
 		 * lastNonZeroPos += 1; } } }
 		 */
-		int NZP = 0;
+		int nZP = 0;
 		for (int i = 0; i < ar.length; i++) {
 			if (ar[i] != 0) {
-				ar[NZP++] = ar[i];
+				ar[nZP++] = ar[i];
 				ar[i] = 0;
 			}
 
