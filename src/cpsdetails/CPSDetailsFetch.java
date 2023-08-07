@@ -1,18 +1,20 @@
 package cpsdetails;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ParameterMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 
 public class CPSDetailsFetch {
@@ -21,18 +23,28 @@ public class CPSDetailsFetch {
 	private static final String userName = "cps_user";
 	private static final String password = "cps_user";
 	private static boolean likeFlag;
-	private static boolean AMDFlag;
 
+	enum Rows {
+		CPS_PROD(13), ARTICLE_METADATA(21), BUNDLE_AUDIT(12);
+
+		private int rows;
+
+		Rows(int i) {
+			this.rows = i;
+		}
+
+		public int getVal() {
+			return this.rows;
+		}
+	}
+
+	static String listFilepath = "C:\\cps\\sql\\input.txt";
 	static {
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-	}
-
-	public static BufferedReader getReader() throws IOException {
-		return new BufferedReader(new InputStreamReader(Files.newInputStream(Paths.get("C:\\cps\\sql\\input.txt"))));
 	}
 
 	public static BufferedWriter getWriter() throws IOException {
@@ -49,13 +61,16 @@ public class CPSDetailsFetch {
 		return Optional.empty();
 	}
 
-	public static Optional<PreparedStatement> getPreparedStatement(Optional<Connection> connection, String sql) {
+	public static Optional<PreparedStatement> getPreparedStatement(Optional<Connection> connection, String sql)
+			throws IOException {
+
+		int insertIndex = sql.lastIndexOf('?');
+		sql = sql.substring(0, insertIndex) + String.join(",", Collections.nCopies(1000, "?")) + ")";
+		System.out.println(sql);
 		if (connection.isPresent()) {
 			try {
 				if (sql.contains("like"))
 					CPSDetailsFetch.likeFlag = true;
-				else if (sql.contains("ARTICLEMETADATA"))
-					AMDFlag = true;
 				return Optional.ofNullable(connection.get().prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE,
 						ResultSet.CONCUR_UPDATABLE));
 			} catch (SQLException e) {
@@ -65,73 +80,57 @@ public class CPSDetailsFetch {
 		return Optional.empty();
 	}
 
-	public static void getDetailsUsingID(Optional<PreparedStatement> statement) {
+	public static void getDetailsUsingID(Optional<PreparedStatement> statement, String table)
+			throws IOException, SQLException {
 		PreparedStatement preparedStatement = null;
-		BufferedReader reader = null;
 		BufferedWriter writer = null;
-		String field = null;
 		try {
-			reader = getReader();
 			writer = getWriter();
-			field = reader.readLine();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		if (statement.isPresent()) {
 			preparedStatement = statement.get();
-			int fieldCount = 0;
-			fileRead: while (field != null) {
-				fieldCount++;
-				System.out.println(fieldCount + ".  " + field);
-				ResultSet resultSet = null;
-
-				try {
-					if (likeFlag)
-						field = "%" + field.concat("%");
-					System.out.println(field);
-					preparedStatement.setString(1, field);
-					resultSet = preparedStatement.executeQuery();
-					ResultSetMetaData metaData = resultSet.getMetaData();
-					if (fieldCount == 1) {
-//						21
-						int iterations;
-						if (AMDFlag)
-							iterations = 21;
-						else
-							iterations = 13;
-						for (int i = 1; i <= iterations; i++) {
-							writer.write(metaData.getColumnName(i));
-							if (i < 13)
-								writer.write(",");
-						}
-						writer.newLine();
-					}
-					if (!resultSet.next()) {
-						writer.write("No details found for " + field);
-						field = reader.readLine();
-						writer.newLine();
-						continue fileRead;
-					} else {
-						resultSet.beforeFirst();
-						while (resultSet.next()) {
-							StringBuilder builder = new StringBuilder();
-							for (int i = 1; i <= 13; i++) {
-								builder.append(resultSet.getString(i));
-								if (i < 13)
-									builder.append(",");
-							}
-							writer.write(builder.toString());
-							writer.newLine();
-							writer.flush();
-						}
-					}
-					field = reader.readLine();
-				} catch (SQLException | IOException e) {
-					StringBuilder mailSubject = new StringBuilder();
-					mailSubject.append("Exception occured !!!!\n").append(e);
-					MailNotification.sendMail(mailSubject.toString(), "Error while Fetching Details");
-					e.printStackTrace();
+			int fieldCount = 1;
+			List<String> list = Files.readAllLines(Paths.get(listFilepath));
+			for (int i = 0; i < list.size() / 1000; i++) {
+				int initialVal = 1;
+				while (initialVal <= 1000 && fieldCount > list.size()) {
+					preparedStatement.setString(initialVal, list.get(fieldCount));
+					initialVal++;
+					fieldCount++;
 				}
+				int rowsNum = table.intern().equalsIgnoreCase("cps") ? Rows.CPS_PROD.getVal()
+						: table.equalsIgnoreCase("bundle") ? Rows.BUNDLE_AUDIT.getVal()
+								: Rows.ARTICLE_METADATA.getVal();
+				ResultSet rs = preparedStatement.executeQuery();
+				ResultSetMetaData metaData = preparedStatement.getMetaData();
+				int temp = 1;
+				while (temp <= rowsNum) {
+					writer.write(metaData.getColumnName(temp++));
+					writer.write(',');
+					writer.flush();
+				}
+				writer.newLine();
+
+				if (rs.first()) {
+					System.out.println("Hi");
+					rs.beforeFirst();
+					while (rs.next()) {
+						List<String> rsList = new LinkedList<>();
+						for (int k = 1; k <= rowsNum; k++) {
+
+							rsList.add(rs.getString(k));
+						}
+						StringBuilder builder = new StringBuilder();
+						System.out.println(rsList);
+						rsList.stream().map(s -> builder.append(s).append(','));
+						writer.write(builder.toString());
+						writer.newLine();
+						writer.flush();
+					}
+				}
+
 			}
 			StringBuilder mailSubject = new StringBuilder();
 			mailSubject.append("Details Fetching completed .............\n")

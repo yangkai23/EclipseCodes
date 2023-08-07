@@ -21,4 +21,5 @@ public final class CpsQueries {
 	public static final String deliveryFileQuery = templateQuery + "\n WHERE DELIVERY_FILE_NAME in (?)";
 	public static final String workflowIdQuery = templateQuery + "\n WHERE pci.last_orchestration_id IN  (?)";
 	public static final String articleIDQuery = "select * from cps.ARTICLEMETADATA a where a.ARTICLEID in (?)";
+	public static final String bundleAudit="select * from CPS.BUNDLE_AUDIT_E2E baee where FILENAME in (?)";
 }

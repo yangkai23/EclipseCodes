@@ -10,5 +10,7 @@
 	<classpathentry kind="lib" path="lib/ojdbc8-21.9.0.0.jar"/>
 	<classpathentry kind="lib" path="lib/activation-1.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/javax.mail-1.6.2.jar"/>
+	<classpathentry kind="lib" path="C:/cps/other projects/jars/spring-jdbc-6.0.9.jar"/>
+	<classpathentry kind="lib" path="C:/cps/other projects/jars/spring-tx-3.1.1.RELEASE.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
