@@ -11,19 +11,20 @@ public class AtleastOneGreaterArr {
 			ar[i] = scanner.nextInt();
 		}
 		int max = ar[0];
-		int maxCount = 0;
+		int temp = max;
+		int maxCount = 1;
 		for (int i = 1; i < ar.length; i++) {
-			if (max == ar[i]) {
+			max = Math.max(max, ar[i]);
+			if (temp == ar[i]) {
 				maxCount++;
-				continue;
-			}
-			if (ar[i] > max) {
-				max = ar[i];
+			} else if (max > temp) {
 				maxCount = 1;
 			}
-
+			temp = max;
 		}
+		System.out.println(max);
 		System.out.println(maxCount);
+		System.out.println(ar.length - maxCount);
 		scanner.close();
 	}
 }
