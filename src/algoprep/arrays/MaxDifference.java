@@ -1,9 +1,8 @@
-package algoprep;
+package algoprep.arrays;
 
 import java.util.Scanner;
 
-public class TwoSum {
-
+public class MaxDifference {
 	public static void main(String[] args) {
 		Scanner scanner = new Scanner(System.in);
 		int size = scanner.nextInt();
@@ -11,18 +10,16 @@ public class TwoSum {
 		for (int i = 0; i < size; i++) {
 			ar[i] = scanner.nextInt();
 		}
-		int req = scanner.nextInt();
+		int max = Integer.MIN_VALUE;
+		int min = Integer.MAX_VALUE;
 		for (int i = 0; i < ar.length; i++) {
-			for (int j = i + 1; j < ar.length; j++) {
-				if (ar[i] + ar[j] == req) {
-					System.out.println("true");
-					scanner.close();
-					return;
-				}
-			}
-			System.out.println("false");
+			max = Math.max(max, ar[i]);
+			min = Math.min(min, ar[i]);
 		}
-
+		System.out.println(max - min + ar.length - 1);
 		scanner.close();
 	}
+
+	
+
 }

@@ -1,4 +1,4 @@
-package algoprep;
+package algoprep.pattern;
 
 import java.util.Scanner;
 

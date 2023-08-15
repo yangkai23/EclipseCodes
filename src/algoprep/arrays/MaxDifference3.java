@@ -1,4 +1,4 @@
-package algoprep;
+package algoprep.arrays;
 
 import java.util.Scanner;
 

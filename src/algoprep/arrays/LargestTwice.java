@@ -1,37 +1,33 @@
-package algoprep;
+package algoprep.arrays;
 
 import java.util.Scanner;
 
-public class MaxDifference2 {
+public class LargestTwice {
 	public static void main(String[] args) {
 		Scanner scanner = new Scanner(System.in);
 		int size = scanner.nextInt();
 		int ar[] = new int[size];
+
 		for (int i = 0; i < size; i++) {
 			ar[i] = scanner.nextInt();
 		}
-		int max1 = maxdifference_1(ar);
-		System.out.println(max1);
+		System.out.println(dominantIndex(ar));
 		scanner.close();
 	}
 
-	public static int maxdifference_1(int[] arr) {
-		for (int i = 0; i < arr.length; i++) {
-			arr[i] = arr[i] + i;
-		}
+	public static int dominantIndex(int[] arr) {
 		int max = Integer.MIN_VALUE;
-		int min = Integer.MAX_VALUE;
-
+		int index = -1;
+		int second = -1;
 		for (int i = 0; i < arr.length; i++) {
 			if (arr[i] > max) {
+				second = max;
 				max = arr[i];
-			}
-
-			if (arr[i] < min) {
-				min = arr[i];
-			}
+				index = i;
+			} else if (arr[i] > second)
+				second = arr[i];
 		}
-		return max - min;
+		return second * 2 <= max ? index : -1;
 	}
 
 }
