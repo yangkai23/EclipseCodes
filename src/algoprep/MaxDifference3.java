@@ -2,7 +2,7 @@ package algoprep;
 
 import java.util.Scanner;
 
-public class MaxDifference2 {
+public class MaxDifference3 {
 	public static void main(String[] args) {
 		Scanner scanner = new Scanner(System.in);
 		int size = scanner.nextInt();
@@ -17,7 +17,7 @@ public class MaxDifference2 {
 
 	public static int maxdifference_1(int[] arr) {
 		for (int i = 0; i < arr.length; i++) {
-			arr[i] = arr[i] + i;
+			arr[i] = arr[i] - i;
 		}
 		int max = Integer.MIN_VALUE;
 		int min = Integer.MAX_VALUE;
