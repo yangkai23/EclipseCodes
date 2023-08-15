@@ -16,7 +16,10 @@ public class MaxDifference {
 			max = Math.max(max, ar[i]);
 			min = Math.min(min, ar[i]);
 		}
-		System.out.println(max - min);
+		System.out.println(max - min + ar.length - 1);
 		scanner.close();
 	}
+
+	
+
 }
