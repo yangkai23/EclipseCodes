@@ -15,14 +15,12 @@ public class PalindromeCheck {
 	}
 
 	private static boolean isPalindrome(String string) {
-		if(string==null||string.isBlank() || string.isEmpty())
-			return false;
+		string = string.trim().toLowerCase();
 		char ch[] = string.toCharArray();
-		for (int i = 0; i < ch.length / 2; i++) {
-			char t = ch[i];
-			ch[i] = ch[ch.length - i - 1];
-			ch[ch.length - i - 1] = t;
+		for (int i = 0; i < ch.length; i++) {
+			if (ch[i] != ch[ch.length - i - 1])
+				return false;
 		}
-		return String.valueOf(ch).equals(string);
+		return true;
 	}
 }
