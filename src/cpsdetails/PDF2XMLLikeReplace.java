@@ -16,7 +16,7 @@ public class PDF2XMLLikeReplace {
 				new OutputStreamWriter(Files.newOutputStream(Paths.get("C:\\cps\\sql\\output.txt"))));
 		String file = reader.readLine();
 		while (file != null) {
-			writer.write("/home/ec2-user/Retroloads/PQDT/1/package/,".concat(file));
+			writer.write(file.replaceFirst("/package/", "/package/,"));
 			writer.newLine();
 			writer.flush();
 			file = reader.readLine();
