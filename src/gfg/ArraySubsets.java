@@ -14,14 +14,14 @@ public class ArraySubsets {
 		printArrSubsets(ar, -1, list);
 	}
 
-	private static void printArrSubsets(int[] ar, int i, LinkedList<Integer> list) {
+	private static LinkedList<Integer> printArrSubsets(int[] ar, int i, LinkedList<Integer> list) {
 		i++;
 		if (i == ar.length)
-			return;
-		printArrSubsets(ar, i, add(ar[i], list));
-		System.out.println(list);
+			return list;
+		LinkedList<Integer> ls = printArrSubsets(ar, i, add(ar[i], list));
+		System.out.println(ls+"   "+i);
 		list.removeLast();
-		printArrSubsets(ar, i, list);
+		return printArrSubsets(ar, i, ls);
 	}
 
 	private static LinkedList<Integer> add(int num, LinkedList<Integer> list) {
